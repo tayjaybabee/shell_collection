@@ -1,0 +1,20 @@
+#!/bin/bash
+
+##################################################
+
+# File: subshell.sh
+# Created: 12/9/2020
+# Author: Taylor-Jayde Blackstone
+
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^##
+
+# Description:
+# A test bash script that demonstrates the opening
+# of a sub-shell.
+
+##################################################
+
+sudo bash << EOF
+echo "Hello World"
+whoami
+EOF

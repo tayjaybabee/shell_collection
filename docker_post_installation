@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Created: 12/08/2020 - 11:07PM
+# Purpose: Prepare environment after installation of docker.
+
+sudo_use_help () {
+
+    printf "\nThe following commands would be run using the 'sudo' prefix:"
+    printf "\ngroupadd\nusermod\nchown\nchmod\nsystemctl\nchkconfig\n"
+    confirm_sudo_use
+
+}
+
+confirm_sudo_use () {
+
+    echo "This wizard may use the 'sudo' prefix which (when used) may ask for your password."
+    read -p "Continue? [N/y/?] " -n 1 -r
+    if [[ $REPLY =~ ^[Yy]$ ]]
+        then
+            printf "Very well, starting wizard..."
+            main
+    else
+        if [[ $REPLY =~ ^[?]$ ]]
+            then
+                sudo_use_help
+        fi
+    fi
+    
+    printf "\n\nI can't move forward without this permission. If you'd like you can open the script and take a look at the process to do it yourself.\n\n"
+    exit 1
+    
+    
+
+
+}
+
+main () {
+
+    echo "Creating 'docker' group"
+    sudo groupadd docker
+    echo "Adding you to the 'docker' group"
+    sudo usermod -aG docker $USER
+    echo "Activating changes to groups"
+    newgrp docker
+    echo "Downloading a test container and running it to test"
+    docker run hello-world
+    echo $?
+
+}
+
+echo "Welcome!"
+
+# Check if sudo, if so tell the user to run regularly and we'll take care of sudo calls
+if [ "$EUID" == 0  ]
+    then
+        echo "Please do not run this file as root!"
+        echo "Try running again, but this time don't use 'sudo'"
+        exit 1
+fi
+
+confirm_sudo_use

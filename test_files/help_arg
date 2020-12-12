@@ -1,0 +1,27 @@
+#!/bin/bash
+
+########################
+
+# File: help_arg.sh
+# Created: 12/09/2020
+# Author: Taylor-Jayde Blackstone
+# Language: BASH script
+# Description: Learning/Demonstrating how Bash parses
+#              command-line arguments so that we may
+#              take advantage of them in order to set the
+#              config options to pass to the program.
+
+########################
+
+for arg in "$@"
+do
+    if [ "$arg" == "--help" ] || [ "$arg" == "-h" ]
+    then
+        printf \
+                "This is a sample help message\n\n\n
+                    With a little formatting.
+
+		"
+    fi
+done
+
