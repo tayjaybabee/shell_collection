@@ -34,7 +34,7 @@ confirm_sudo_use () {
 
 }
 
-main () {
+main () {  
 
     echo "Creating 'docker' group"
     sudo groupadd docker
