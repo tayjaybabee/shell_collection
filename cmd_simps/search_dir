@@ -1,0 +1,7 @@
+#!/bin/bash  
+
+#^ Shebang for bash executable script.
+
+s_pattern=$1
+
+echo $(ls | grep $s_pattern)

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+VID_BYTES="$(du -sb ~/Videos/ | cut -f1)"
+
+MUS_BYTES="$(du -sb ~/Music/ | cut -f1)"
+
+TOTAL_BYTES=$(expr $VID_BYTES + $MUS_BYTES)
+
+# Issue a tar command
+tar -cf - ~/Videos/ \
+  | tqdm --bytes --total "$TOTAL_BYTES" --desc Processing media... | gzip \
+  | tqdm --bytes --total "$VID_BYTES" --desc Compressing videos... --position 1 \
+  | tqdm --bytes --total "$MUS_BYTES" --desc Compressing music... --position 2 \
+  > ~/backup.tgz
+
+tar -cf - ~/Music/ \
+  | tqdm --bytes --total "$MUS_BYTES" --desc Processing music | gzip \
+  | tqdm --bytes --total "$MUS_BYTES" --desc Compressed --position 2 \
+  >> ~/backup.tgz

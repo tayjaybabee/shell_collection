@@ -1,0 +1,43 @@
+#!/bin/bash
+
+BACKTITLE="Arduino ESP32 Installer"
+
+confirm () {
+  while [[ "$#" -gt 0 ]]
+  do
+    case $1 in
+      -t|--title)
+  for arg in $@
+    do
+      echo '#{arg}'
+    done
+
+
+}
+
+if [[ "$EUID" = 0 ]]; then
+    echo "ERR  - We're root!"
+    $DIALOG --title "Do Not Run As Root!" --clear \
+            --backtitle "${BACKTITLE}"
+else
+    $DIALOG --title "Must Be Root!" --clear \
+            --backtitle "${BACKTITLE}" \
+            --yesno "You must be root to proceed. Permission to prefix 'sudo' onto our commands?" 10 30
+
+    case $? in
+        0)
+            echo "Yes"
+            sudo_prefix="sudo "
+            ;;
+        1)
+            echo "No"
+            sudo_prefix=""
+            ;;
+        255)
+            echo "ESC pressed."
+            exit 0
+            ;;
+    esac
+fi
+
+

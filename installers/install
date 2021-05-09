@@ -1,0 +1,38 @@
+$DIALOG --title "Confirm Install" --clear \
+        --backtitle "ESP-IDF Installer" \
+        --yesno "This will install ESP-IDF to your system. Would you like to proceed?" 10 30
+
+case $? in
+  0)
+    echo "MSG - User confirmed install"
+    ;;
+  1)
+    echo "MSG - User exited"
+    exit 0
+    ;;
+  255)
+    echo "MSG - [ESC] pressed."
+    exit 0
+    ;;
+esac
+
+# Make temporary directory
+echo "MSG - Making download directory..."
+mkdir -p ~/.tmp/esp
+echo "OK  - Directory made!"
+
+# Make note of where we are
+echo "MSG - Noting current path..."
+cur_dir=$PWD
+echo "OK  - Path noted!"
+
+# Change into the directory we made
+echo "MSG - Moving into ~/.tmp/esp..."
+cd ~/.tmp/esp
+echo "OK  - Now in $PWD"
+
+# Clone github repo
+echo "MSG - Downloading ESP-IDF from Github..."
+git clone --recursive https://github.com/espressif/esp-idf.git
+echo "OK  - Github repo cloned to ~/.tmp/esp/esp-idf"
+

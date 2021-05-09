@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+source "$( cd "${BASH_SOURCE[0]%/*}" && pwd )/lib/bootstrap.sh"
+
+DIALOG=${DIALOG=dialog}
+
+if [[ "$EUID" = 0 ]]; then
+    echo "MSG  - We're root!"
+    $DIALOG --title "Do Not Run as Root!" \
+            --backtitle "Joplin Installer" \
+            --msgbox "Please do not start this file as root. This will make downloaded files inaccessible, thereby breaking your install." 10 41
+            
+    exit 1
+else
+    $DIALOG --title "Must Be Root!" --clear \
+            --backtitle "Joplin Installer" \
+            --yesno "You must be root to proceed. Permission to prefix 'sudo' onto our commands?" 10 30
+
+    case $? in
+        0)
+            echo "Yes"
+            sudo_prefix="sudo "
+            ;;
+        1)
+            echo "No"
+            sudo_prefix=""
+            ;;
+        255)
+            echo "ESC pressed."
+            exit 0
+            ;;
+    esac
+fi
+
+
+import util/log
+
+namespace installJoplin
+
+Log::AddOutput installJoplin STDERR
+
+myLoggingDelegate() {
+
+  if [[ $subject -eq 'LOG' ]]
+    then
+      subject='msg'
+  fi
+
+  case $subject in
+    'msg')
+      prefix='| MSG  | - '
+      ;;
+    'err')
+      prefix='| ERR  | - '
+      ;;
+    'ok')
+      prefix='| OK   | - '
+      ;;
+    'warn')
+      prefix='| WARN | - '
+      ;;
+      
+  esac
+  echo "${prefix}$*"
+
+}
+
+DL_URL=https://raw.githubusercontent.com/laurent22/joplin/master/Joplin_install_and_update.sh
+
+TMP_DIR="${HOME}/.tmp/installJoplin"
+
+LAST_DIR=$PWD
+
+cleanUp () {
+  subject='msg' Log "Cleaning up..."
+  cd $LAST_DIR
+  rm -rf $TMP_DIR
+  subject='ok' Log "Finished!"
+}
+
+installedNotify () {
+
+  $DIALOG --title "Already Installed!" \
+          --backtitle "Joplin Installer" \
+          --msgbox "Joplin is already installed!" 10 41
+
+}
+
+checkInstall () {
+
+  local installed=false
+  
+  if [[ $(command -v joplin) ]]
+  
+  then
+    local installed=true
+  
+  fi
+  
+  return $installed
+
+}
+
+installJoplin () {
+
+  subject='msg' Log "Checking to see if Joplin is already installed..."
+  
+  if [[ $(checkInstall) ]]
+  
+  then
+    
+    subject='err' Log "Joplin is already installed!"
+    installedNotify
+    
+  else
+    subject='ok' Log "No install of Joplin found!"
+    
+  fi
+
+  subject='msg' Log "Updating apt cache...]"
+  sudo apt update
+  subject='ok' Log "Apt cache updated!"
+  
+  subject='msg' Log "Creating temporary directory..."
+  mkdir -p $TMP_DIR
+  subject='ok' Log "Created ${TMP_DIR}!"
+  
+  subject='msg' Log "Moving into ${TMP_DIR}..."
+  cd ${TMP_DIR}
+  subject='ok' Log "Now in ${TMP_DIR}!"
+  
+  subject='msg' Log "Downloading and running installer...."
+  wget -O - $DL_URL | bash
+  subject='ok' Log "Joplin installed!"
+  
+  if [[ $(checkInstall) ]]
+  
+  then
+  
+    subject='ok' Log "Joplin installed!"
+    
+  else
+    subject='err' Log "Joplin failed to install properly!"
+  
+  fi  
+  cleanUp
+  
+}
+
+Log::RegisterLogger LOG myLoggingDelegate
+
+Log::AddOutput installJoplin/installJoplin LOG
+Log::AddOutput installJoplin/checkInstall LOG
+Log::AddOutput installJoplin/cleanUp LOG
+
+installJoplin

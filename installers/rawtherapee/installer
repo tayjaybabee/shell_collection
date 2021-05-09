@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Greet user
+echo 'Welcome $USER'

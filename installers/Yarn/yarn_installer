@@ -1,0 +1,23 @@
+#!/bin/bash
+
+####################################
+######## yarn_installer.sh #########
+####################################
+######## Created: 12/27/2020 #######
+# Author: Taylor-Jayde Blackstone ##
+# Email: t.blackstone@inspyre.tech #
+#||||||||||||||||||||||||||||||||||#-\
+# Description: Installs the "Yarn"    \
+# package manager to an Ubuntu sysytem |
+# through apt after adding a repo.     |
+#---------------------------------------
+# Ver: 1.0.1
+
+# Grab the public key from the official site, and add it to your apt key collection
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+
+# Add the repo to your sources list
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+ 
+# Install Yarn through apt
+sudo apt update && sudo apt install yarn -y

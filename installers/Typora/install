@@ -1,0 +1,60 @@
+#!/bin/bash
+
+DIALOG=${DIALOG=dialog}
+
+if [[ "$EUID" = 0 ]]; then
+    echo "MSG  - We're root!"
+else
+    $DIALOG --title "Must Be Root!" --clear \
+            --backtitle "Typora Installer" \
+            --yesno "You must be root to proceed. Permission to prefix 'sudo' onto our commands?" 10 30
+
+    case $? in
+        0)
+            echo "Yes"
+            sudo_prefix="sudo "
+            ;;
+        1)
+            echo "No"
+            sudo_prefix=""
+            ;;
+        255)
+            echo "ESC pressed."
+            exit 0
+            ;;
+    esac
+fi
+
+# Download Typora's public key
+cmd1="${sudo_prefix}apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA300B7755AFCFAE"
+
+# Add it's repository
+cmd2="${sudo_prefix}add-apt-repository 'deb https://typora.io/linux ./'"
+
+# Update package listing
+cmd3="${sudo_prefix}apt update"
+
+# Install the typora package
+cmd4="${sudo_prefix}apt-get install typora -y"
+
+# Run commands!
+
+# Get key.
+echo "MSG - Getting Typora's public key..."
+$cmd1 > /dev/null
+echo "OK - Got public key!"
+
+# Add repo.
+echo "MSG - Adding it's repository to apt..."
+$cmd2
+echo "OK - Repository added!"
+
+# Update cache.
+echo "MSG - Running 'apt update'..."
+$cmd3
+echo "OK - Package listing updated!"
+
+# Install target.
+echo "MSG - Installing Typora..."
+$cmd4
+echo "OK - Install finished! Thank you!"

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+mkdir ./$1
+
+touch ./$1/__init__.py
+
+ls ./$1

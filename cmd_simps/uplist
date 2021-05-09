@@ -1,0 +1,6 @@
+#!/bin/bash
+
+address=$1
+
+nmap -v -sn $address | grep "Nmap scan report for" | grep -v "host down"
+
